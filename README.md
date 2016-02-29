@@ -19,7 +19,7 @@ Now we can checkout our dependencies using the following :
 git clone https://github.com/lawrenceleejr/Ext_RestFrames.git
 rc checkout_pkg atlasoff/PhysicsAnalysis/TopPhys/QuickAna/tags/QuickAna-00-00-94 QuickAna
 rc checkout_pkg svn+ssh://svn.cern.ch/reps/atlasinst/Institutes/LBNL/AnalysisToolsRunII/CommonTools/tags/CommonTools-00-00-17 CommonTools
-git clone https://github.com/UCATLAS/xAODAnaHelpers.git
+git clone https://github.com/UCATLAS/xAODAnaHelpers.git; cd xAODAnaHelpers; git checkout 00-03-27; cd ..;
 ```
 
 And of course do a normal rc set up procedure
@@ -32,7 +32,7 @@ rc compile
 Then you can run a test with e.g.:
 
 ```
-python RJigsawTools/util/run_lvlv.py  --doOverwrite --nevents 10 --verbosity debug --dataDir /afs/cern.ch/user/l/leejr/work/lvlv_datasets #[point to a location of a DxAOD]
+python RJigsawTools/util/run_lvlv.py  --doOverwrite --nevents 10 --verbosity debug --dataDir /afs/cern.ch/user/l/leejr/work/public/lvlv_datasets #[point to a location of a DxAOD]
 ```
 
 PLEASE NOTE : The output will be in
