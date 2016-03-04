@@ -124,18 +124,45 @@ EL::StatusCode RegionVarCalculator_tls::doAllCalculations(std::map<std::string, 
   std::vector<double> lepEtaVec;
   std::vector<double> lepPhiVec;
   std::vector<double> lepEVec;
+  std::vector<double> lepPdgVec;
+  std::vector<double> SFVec;
+  std::vector<double> SSVec;
 
   for( const auto& lep : *leptons_nominal) {
     lepPtVec.push_back( lep->pt());
     lepEtaVec.push_back( lep->p4().Eta() );
     lepPhiVec.push_back( lep->p4().Phi() );
     lepEVec.push_back( lep->p4().E() );
+    lepPdgVec.push_back( lep->pdgId());
   }
+
+  bool isSS = false;
+  bool isSF = false;
+  if(lepPdgVec.size()==2){
+    if(abs(lepPdgVec[0])==abs(lepPdgVec[1])){
+      isSF = true;
+    }
+    if(lepPdgVec[0]>0){
+      if(lepPdgVec[1]>0){isSS = true;}
+    }
+    if(lepPdgVec[0]<0){
+      if(lepPdgVec[1]<0){isSS = true;}
+    }
+  }
+
+  if(isSF){SFVec.push_back(1);}
+  else{SFVec.push_back(0);}
+
+  if(isSS){SSVec.push_back(1);}
+  else{SSVec.push_back(0);}
 
   VecRegionVars[ "lepPt" ]  = lepPtVec;
   VecRegionVars[ "lepEta" ] = lepEtaVec;
   VecRegionVars[ "lepPhi" ] = lepPhiVec;
   VecRegionVars[ "lepE" ]   = lepEVec;
+  VecRegionVars[ "lepPdg" ]   = lepPdgVec;
+  VecRegionVars[ "isSF" ]   = SFVec;
+  VecRegionVars[ "isSS" ]   = SSVec;
 
   return EL::StatusCode::SUCCESS;
 }

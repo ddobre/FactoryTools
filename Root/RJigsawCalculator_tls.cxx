@@ -580,6 +580,31 @@ EL::StatusCode RJigsawCalculator_tls::doCalculate(std::map<std::string, double>&
   float  m_pT_temp_jet1b = 0.;
   float  m_pT_temp_jet2b = 0.;
 
+  int Nel = electronID.size();
+  int Nmu = muonID.size();
+  int temp_Nlep_a = 0;
+  int temp_Nlep_b = 0;
+
+  for(int e = 0; e < Nel; e++){
+    RestFrame const& eframe = VIS->GetFrame(electronID[e]);
+    if(V1a->IsSame(eframe) || V2a->IsSame(eframe)){temp_Nlep_a++;}
+    if(V1b->IsSame(eframe) || V2b->IsSame(eframe)){temp_Nlep_b++;}
+  }
+
+  for(int m = 0; m < Nmu; m++){
+    RestFrame const& mframe = VIS->GetFrame(muonID[m]);
+    if(V1a->IsSame(mframe) || V2a->IsSame(mframe)){temp_Nlep_a++;}
+    if(V1b->IsSame(mframe) || V2b->IsSame(mframe)){temp_Nlep_b++;}
+  }
+  //  float const m_Nlep_a = temp_Nlep_a;                                                                                                                                                                     //float const m_Nlep_b = temp_Nlep_b;                                                                                                                                                                     
+  bool sameHemi_lep = false;
+
+  if(temp_Nlep_a == 2||temp_Nlep_b ==2){sameHemi_lep = true;}
+
+  float temp_shl = 0;
+  if(sameHemi_lep){temp_shl = 1;}
+  float const m_isSH = temp_shl;
+
   int N = jetID.size();
   for(int j = 0; j < N; j++){
     RestFrame const& frame = VIS->GetFrame(jetID[j]);
@@ -889,6 +914,7 @@ EL::StatusCode RJigsawCalculator_tls::doCalculate(std::map<std::string, double>&
   //  RJVars["minH3P"]    = m_minH3P; //m_minH3P;
   RJVars["sangle"]    = m_sangle;
   RJVars["dangle"]    = m_dangle;
+  RJVars["isSH"]      = m_isSH;
 
   return EL::StatusCode::SUCCESS;
 }
