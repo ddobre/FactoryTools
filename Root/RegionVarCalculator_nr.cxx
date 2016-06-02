@@ -73,11 +73,24 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   std::vector<double> jetPhiVec;
   std::vector<double> jetEVec;
 
+  double jetHt = 0;
+  double jetHt_lead = 0;
+
+  int counter = 0;
+
+
   for( const auto& jet : *jets_nominal) {
     jetPtVec.push_back( toGeV(jet->pt()));
     jetEtaVec.push_back( jet->p4().Eta() );
     jetPhiVec.push_back( jet->p4().Phi() );
     jetEVec.push_back( toGeV(jet->p4().E()) );
+
+    jetHt += jet->pt();
+
+    if( counter < 4 ) {
+      jetHt_lead += jet->pt();
+      counter ++;
+    }
   }
 
   VecRegionVars[ "jetPt" ]  = jetPtVec;
@@ -85,6 +98,9 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   VecRegionVars[ "jetPhi" ] = jetPhiVec;
   VecRegionVars[ "jetE" ]   = jetEVec;
 
+  RegionVars[ "JetHt" ] = jetHt;
+  RegionVars[ "JetHt_lead" ] = jetHt_lead;
+ 
   return EL::StatusCode::SUCCESS;
 }
 
