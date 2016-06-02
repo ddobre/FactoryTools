@@ -78,7 +78,6 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
 
   int counter = 0;
 
-
   for( const auto& jet : *jets_nominal) {
     jetPtVec.push_back( toGeV(jet->pt()));
     jetEtaVec.push_back( jet->p4().Eta() );
