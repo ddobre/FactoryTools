@@ -73,6 +73,8 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   std::vector<double> jetPhiVec;
   std::vector<double> jetEVec;
 
+  std::vector<double> HtCounter;
+
   double jetHt = 0;
   double jetHt_lead = 0;
 
@@ -88,14 +90,18 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
 
     if( counter < 4 ) {
       jetHt_lead += jet->pt();
-      counter ++;
     }
+  counter ++;
   }
+
+  HtCounter.push_back(counter);
 
   VecRegionVars[ "jetPt" ]  = jetPtVec;
   VecRegionVars[ "jetEta" ] = jetEtaVec;
   VecRegionVars[ "jetPhi" ] = jetPhiVec;
   VecRegionVars[ "jetE" ]   = jetEVec;
+
+  VecRegionVars[ "HtCounter" ] = HtCounter;
 
   RegionVars[ "JetHt" ] = jetHt;
   RegionVars[ "JetHt_lead" ] = jetHt_lead;
