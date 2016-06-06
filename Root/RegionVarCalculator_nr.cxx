@@ -67,18 +67,24 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   xAOD::IParticleContainer* jets_nominal(nullptr);
   STRONG_CHECK(store->retrieve(jets_nominal, "selectedJets"));
 
-  //  const std::vector<xAOD::IParticle*> & jetStdVec = jetcont->stdcont();
+  // ---------- Initialize variables
+  
+  std::vector<double> Htcounter;
+
   std::vector<double> jetPtVec;
   std::vector<double> jetEtaVec;
   std::vector<double> jetPhiVec;
   std::vector<double> jetEVec;
 
-  std::vector<double> HtCounter;
-
   double jetHt = 0;
   double jetHt_lead = 0;
 
+  TLorentzVector jetHt_invM;
+  TLorentzVector jetHt_lead_invM;
+  
   int counter = 0;
+
+  // ---------- Loop over the container 
 
   for( const auto& jet : *jets_nominal) {
     jetPtVec.push_back( toGeV(jet->pt()));
@@ -86,26 +92,36 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
     jetPhiVec.push_back( jet->p4().Phi() );
     jetEVec.push_back( toGeV(jet->p4().E()) );
 
-    jetHt += jet->pt();
-
+    jetHt += toGeV(jet->pt());
+    jetHt_invM += jet->p4();
+    // std::cout << "pt: " << toGeV(jet->pt()) << " counter: " << counter <<  std::endl;
+    
     if( counter < 4 ) {
-      jetHt_lead += jet->pt();
+      jetHt_lead += toGeV(jet->pt());
+      jetHt_lead_invM += jet->p4();
     }
   counter ++;
   }
 
-  HtCounter.push_back(counter);
-
+  // ---------- Finalize 
+  Htcounter.push_back(counter);
+  
+  VecRegionVars[ "Htcounter" ] = Htcounter;
+    
   VecRegionVars[ "jetPt" ]  = jetPtVec;
   VecRegionVars[ "jetEta" ] = jetEtaVec;
   VecRegionVars[ "jetPhi" ] = jetPhiVec;
   VecRegionVars[ "jetE" ]   = jetEVec;
 
-  VecRegionVars[ "HtCounter" ] = HtCounter;
-
   RegionVars[ "JetHt" ] = jetHt;
-  RegionVars[ "JetHt_lead" ] = jetHt_lead;
- 
+  RegionVars[ "JetHt_lead" ] = jetHt_lead; 
+
+  jetHt = toGeV(jetHt_invM.M());
+  jetHt_lead = toGeV(jetHt_lead_invM.M());
+  
+  RegionVars[ "JetHt_invM" ] = jetHt; 
+  RegionVars[ "JetHt_lead_invM" ] = jetHt_lead;
+  
   return EL::StatusCode::SUCCESS;
 }
 
