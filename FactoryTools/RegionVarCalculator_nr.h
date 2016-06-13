@@ -13,6 +13,8 @@ class RegionVarCalculator_nr : public RegionVarCalculator {
 
 public :
 
+  // bool isTruth = false;
+
 private :
   //todo probably clean this up
   virtual EL::StatusCode doInitialize(EL::Worker * worker);

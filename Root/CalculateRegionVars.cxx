@@ -116,6 +116,10 @@ EL::StatusCode CalculateRegionVars :: initialize ()
   }
   else if(calculatorName == nrCalculator){
     m_calculator  = new RegionVarCalculator_nr;
+    if(isTruth == 1) {
+      m_calculator->isTruth = true;
+    }
+    std::cout << "-------------------- Printing isTruth from CalculateRegionVars.cxx: " << isTruth << std::endl;
     STRONG_CHECK_SC( m_calculator->initialize(wk()));
   }
   else {

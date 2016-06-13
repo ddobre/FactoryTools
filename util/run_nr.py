@@ -69,6 +69,16 @@ algsToRun["postselectDileptonicWW"]    = ROOT.PostselectDileptonicWWEvents()
 
 algsToRun["calculateRegionVars"]                      = ROOT.CalculateRegionVars()
 algsToRun["calculateRegionVars"].calculatorName       = ROOT.CalculateRegionVars.nrCalculator
+# added this
+
+print "=============================="
+print options.isTruth
+
+if options.isTruth :
+  algsToRun["calculateRegionVars"].isTruth              = 1
+
+#ROOT.CalculateRegionVars.isTruth
+############
 
 regionName = "SR"
 tmpWriteOutputNtuple                       = ROOT.WriteOutputNtuple()

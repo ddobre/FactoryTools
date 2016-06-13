@@ -55,12 +55,13 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   doGeneralCalculations(RegionVars, VecRegionVars);
 
   // Get relevant info from the vertex container //////////////////////
-  //
 
-  const xAOD::VertexContainer* vertices = nullptr;
-  STRONG_CHECK(event->retrieve( vertices, "PrimaryVertices"));
-  RegionVars["NPV"] = HelperFunctions::countPrimaryVertices(vertices, 2);
-
+  if( !isTruth ) {
+    const xAOD::VertexContainer* vertices = nullptr;
+    STRONG_CHECK(event->retrieve( vertices, "PrimaryVertices"));
+    RegionVars["NPV"] = HelperFunctions::countPrimaryVertices(vertices, 2);
+  }
+  
   //
   /////////////////////////////////////////////////////////////////////
 
@@ -117,8 +118,6 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
     jetHt += toGeV(jet->pt());
     jetHt_invM += jet->p4();
     
-    // std::cout << "pt: " << toGeV(jet->pt()) << " counter: " << counter <<  std::endl;
-    
     if( counter < 4 ) {
       jetLead_TLor.push_back( jet->p4() ); // I know this is unnecessary - will optimize after
       jetHt_lead += toGeV(jet->pt());
@@ -164,8 +163,6 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   jetLeadPairs_invM.push_back( toGeV( jetLeadPairs[ position_invM[ 0 ] ].M() ) );
   jetLeadPairs_invM.push_back( toGeV( jetLeadPairs[ position_invM[ 1 ] ].M() ) );
 
-  // std::cout << "Lead pairs mass: " << toGeV( jetLeadPairs[ pairs[ 0 ] ].M() ) << " & " << toGeV( jetLeadPairs[ pairs[ 1 ] ].M() ) << std::endl; 
- 
   //      ----------------------------------
   //      ----- Find jet pairs: Angle method 
   //      ----------------------------------

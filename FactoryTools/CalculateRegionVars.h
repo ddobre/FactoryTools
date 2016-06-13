@@ -30,6 +30,7 @@ public:
   // TH1 *myHist; //!
 
   RegionCalculatorName  calculatorName;
+  int isTruth = 0;
 
   // this is a standard constructor
   CalculateRegionVars ();

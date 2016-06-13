@@ -56,10 +56,11 @@ EL::StatusCode RegionVarCalculator::doGeneralCalculations(std::map<std::string, 
   // Get relevant info from the vertex container //////////////////////
   //
 
+  if(!isTruth) { 
   const xAOD::VertexContainer* vertices = nullptr;
   STRONG_CHECK(event->retrieve( vertices, "PrimaryVertices"));
   RegionVars["NPV"] = HelperFunctions::countPrimaryVertices(vertices, 2);
-
+  }
   //
   /////////////////////////////////////////////////////////////////////
 

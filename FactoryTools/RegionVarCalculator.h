@@ -18,6 +18,7 @@ class RegionVarCalculator {
 
 public :
   virtual ~RegionVarCalculator() = 0;
+  bool isTruth = false;
 
 
 public :
