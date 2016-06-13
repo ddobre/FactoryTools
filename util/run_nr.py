@@ -44,6 +44,9 @@ algsToRun = collections.OrderedDict()
 # Basic event selection
 algsToRun["basicEventSelection"]       = ROOT.BasicEventSelection()
 commonOptions.configxAODAnaHelperAlg(algsToRun["basicEventSelection"] )
+if options.isTruth :
+  setattr(algsToRun["basicEventSelection"],"m_useMetaData",False)
+  setattr(algsToRun["basicEventSelection"],"m_truthLevelOnly",True)
 
 # Jet calibration and selection
 if not options.isTruth :

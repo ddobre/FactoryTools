@@ -80,27 +80,21 @@ jetSelectionDict = {
 
   }
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%% JetSelector: truth %%%%%%%%%%%%%%%%%%%%%%%%%%#
+#%%%%%%%%%%%%%%%%%%%%%%%%%% TruthSelector: for jets %%%%%%%%%%%%%%%%%%%%%%%%%%#
 jetSelectionDict_truth = {
-  "m_name"		      :   "JetSelector",
+  "m_name"		      :   "TruthSelector",
   #----------------------- Container Flow ----------------------------#
   "m_inContainerName"         :   "AntiKt4TruthJets",
   "m_outContainerName"        :   "SignalJets",
-  "m_inputAlgo"               :   "AntiKt4TruthJets_Algo",
-  "m_outputAlgo"              :   "SignalJets_Algo",
+  #"m_inputAlgo"               :   "AntiKt4TruthJets_Algo",
+  #"m_outputAlgo"              :   "SignalJets_Algo",
   "m_decorateSelectedObjects" :   True,
   "m_createSelectedContainer" :   True,
   #----------------------- Selections ----------------------------#
   ### max/min selections apply to m_pT, m_eta, m_detEta, m_mass, m_rapidity
-  "m_cleanJets"               :   False,
   "m_pass_min"                :   4,
   "m_pT_min"                  :   50e3,
   "m_eta_max"                 :   2.5,
-  #----------------------- JVT ----------------------------#
-  "m_doJVT"                   :   True,
-  "m_pt_max_JVT"              :   50e3,
-  "m_eta_max_JVT"             :   2.4,
-  "m_JVTCut"                  :   0.64,
   #----------------------- Other ----------------------------#
   ### Require jets pass truth label of (0,1,2,3,21) or 4 or 5
   #"m_truthLabel"              :   5,
@@ -110,6 +104,7 @@ jetSelectionDict_truth = {
   #"m_nToProcess"              :   2,
   ### Require the first N jets to be clean, otherwise fail event
   #"m_cleanEvtLeadJets"        :   4,
-  "m_debug"                   :   False
+  "m_debug"                   :   False,
+  "m_useCutFlow"	      :   True
 
 }

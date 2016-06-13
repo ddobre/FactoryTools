@@ -22,5 +22,5 @@ basicEventSelectionDict = {
     "m_checkDuplicatesData" : True,
     "m_checkDuplicatesMC" : True,
     "m_metaDataStreamName" : "trees",
-    "m_cutFlowStreamName" : "trees",
+#    "m_cutFlowStreamName" : "trees",
 }
