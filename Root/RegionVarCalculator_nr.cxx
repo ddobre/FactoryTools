@@ -81,7 +81,7 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
 
   // Jet Pairs
 
-  std::vector<TLorentzVector> jetLead_TLor;
+  std::vector<TLorentzVector> jet_TLor;
   
   // --- Invariant Mass  
   
@@ -89,7 +89,7 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   double pair_invM;
   std::vector<double> jetLeadPairs_invM;
   std::vector<TLorentzVector> jetLeadPairs;
-  
+
   // --- Angles
 
   int position_angle[2] = { 0 , 5 };
@@ -105,7 +105,13 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   TLorentzVector jetHt_invM;
   TLorentzVector jetHt_lead_invM;
   
+  // Other Variables
+
   int counter = 0;
+  int nearestJet = 0;
+  std::vector<double> jetLeadPairs_difference;
+  std::vector<double> jetLeadPairs_difference_output_invM;
+  std::vector<double> jetLeadPairs_difference_output_angle;
 
   // ---------- Loop over the container 
 
@@ -117,9 +123,11 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
 
     jetHt += toGeV(jet->pt());
     jetHt_invM += jet->p4();
+   
+    // Store all of the 4-vectors 
+    jet_TLor.push_back( jet->p4() ); // I know this is unnecessary - will optimize after
     
-    if( counter < 4 ) {
-      jetLead_TLor.push_back( jet->p4() ); // I know this is unnecessary - will optimize after
+    if( counter < 5 ) {
       jetHt_lead += toGeV(jet->pt());
       jetHt_lead_invM += jet->p4();
     }
@@ -128,40 +136,50 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
 
   // ---------- Calculations
 
+  // ----- Pairing lead 4
+
   for( int i = 0; i < 3; i ++) { 
     for( int j = i + 1; j < 4; j++) {
-      jetLeadPairs.push_back( jetLead_TLor[i] + jetLead_TLor[j] );
-      jetAnglePairs.push_back( jetLead_TLor[i].DeltaR( jetLead_TLor[j] ) );
+      jetLeadPairs.push_back( jet_TLor[i] + jet_TLor[j] );
+      jetAnglePairs.push_back( jet_TLor[i].DeltaR( jet_TLor[j] ) );
+
+      jetLeadPairs_difference.push_back( abs( jet_TLor[i].Pt() - jet_TLor[j].Pt() ) );
     } 
   } 
-
+ 
+  //      -----------------------------------
+  //      ----- Comparing DR between jet5 and nearest of leading
+  //      -----------------------------------
+  
+  if( counter > 4) {
+    for( int i = 0; i < 4; i++) {
+      if( jet_TLor[4].DeltaR( jet_TLor[ i ] ) < jet_TLor[4].DeltaR( jet_TLor[nearestJet] ) ) {
+        nearestJet = i;
+      }
+    } 
+  } 
   //      ----------------------------------- 
   //      ----- Find jet pairs: Invariant mass method
   //      -----------------------------------
 
-  /* 
-  for( int i = 0; i < 6; i++ ) {
-    std::cout << "Invariant mass of pair " << i << " = " << toGeV( jetLeadPairs[i].M() ) << std::endl;
-  }  
-  */
-
   pair_invM = toGeV( abs( (jetLeadPairs[0].M() - jetLeadPairs[5].M() ) ) );
 
   for( int i = 1; i < 3; i++) {
-    
     if( toGeV( abs( (jetLeadPairs[i].M() - jetLeadPairs[5 - i].M() ) ) ) < pair_invM) {
       pair_invM = toGeV( abs( (jetLeadPairs[i].M() - jetLeadPairs[5 - i].M() ) ) );
       position_invM[0] = i;
       position_invM[1] = 5 - i;
     } 
-  }
-  
+  } 
+
   // Now have the two jet pairs which have have the smallest invariant mass difference 
   // Can access them in the pairs array
   // Do something - lets shove the pair's invariant mass into a vector...
   
-  jetLeadPairs_invM.push_back( toGeV( jetLeadPairs[ position_invM[ 0 ] ].M() ) );
-  jetLeadPairs_invM.push_back( toGeV( jetLeadPairs[ position_invM[ 1 ] ].M() ) );
+  for( int i = 0; i < 2; i++ ) {
+    jetLeadPairs_invM.push_back( toGeV( jetLeadPairs[ position_invM[ i ] ].M() ) );
+    jetLeadPairs_difference_output_invM.push_back( toGeV( jetLeadPairs_difference[ position_invM[ i ] ] ) );
+  }
 
   //      ----------------------------------
   //      ----- Find jet pairs: Angle method 
@@ -170,7 +188,6 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   pair_angle = ( jetAnglePairs[ 0 ] + jetAnglePairs[ 5 ] )/2;
 
   for( int i = 1; i < 3; i++) {
-    
     if( (jetAnglePairs[ i ] + jetAnglePairs[ 5 - i ])/2 < pair_angle ) {
       pair_angle = (jetAnglePairs[ i ] + jetAnglePairs[ 5 - i ])/2;
       position_angle[0] = i;
@@ -181,36 +198,68 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
   // Now have the pairs from the the angle algorithm 
   // Can access them in the pairs array
   // Do something - we can toss their invariant mass into a vector and compare with the above one
-
-  jetLeadPairs_angle.push_back( toGeV( jetLeadPairs[ position_angle[ 0 ] ].M() ) );
-  jetLeadPairs_angle.push_back( toGeV( jetLeadPairs[ position_angle[ 1 ] ].M() ) );
-
+  
+  for( int i = 0; i < 2; i++ ) {
+    jetLeadPairs_angle.push_back( toGeV( jetLeadPairs[ position_angle[ i ] ].M() ) );
+    jetLeadPairs_difference_output_angle.push_back( toGeV( jetLeadPairs_difference[ position_angle[ i ] ] ) );
+  }
+  
   // ---------- Finalize 
 
   // Counter 
   Htcounter.push_back(counter);
-  
   VecRegionVars[ "Htcounter" ] = Htcounter;
     
-  // Variables
-  VecRegionVars[ "jetPt" ]  = jetPtVec;
-  VecRegionVars[ "jetEta" ] = jetEtaVec;
-  VecRegionVars[ "jetPhi" ] = jetPhiVec;
-  VecRegionVars[ "jetE" ]   = jetEVec;
+  // Global Variables
+  VecRegionVars[ "Jet_Pt" ]  = jetPtVec;
+  VecRegionVars[ "Jet_Eta" ] = jetEtaVec;
+  VecRegionVars[ "Jet_Phi" ] = jetPhiVec;
+  VecRegionVars[ "Jet_E" ]   = jetEVec;
 
   // jetHt and leading 4 jetHt
-  RegionVars[ "JetHt" ] = jetHt;
-  RegionVars[ "JetHt_lead" ] = jetHt_lead; 
+  RegionVars[ "Jet_Ht" ]      = jetHt;
+  RegionVars[ "Jetlead4_Ht" ] = jetHt_lead;
 
   jetHt = toGeV(jetHt_invM.M());
   jetHt_lead = toGeV(jetHt_lead_invM.M());
-  
-  RegionVars[ "JetHt_invM" ] = jetHt; 
-  RegionVars[ "JetHt_lead_invM" ] = jetHt_lead;
 
-  // Leading jet pairs
-  VecRegionVars[ "JetLeadPairs_invM" ] = jetLeadPairs_invM; 
-  VecRegionVars[ "JetLeadPairs_angle" ] = jetLeadPairs_angle;
+  RegionVars[ "Jet_XInvariantMass" ]      = jetHt;
+  RegionVars[ "Jetlead4_XInvariantMass" ] = jetHt_lead;
+
+  // Leading jet pairs - yy invariant mass
+  VecRegionVars[ "JetLeadPairs_yyInvariantMass_invMMethod" ]  = jetLeadPairs_invM;
+  VecRegionVars[ "JetLeadPairs_yyInvariantMass_angleMethod" ] = jetLeadPairs_angle;
+
+  // Lead jet pairs - angles 
+  RegionVars[ "JetLeadPairs_PairAngle_angleMethod" ]  = jetLeadPairs[position_angle[0]].DeltaR(jetLeadPairs[position_angle[1]]);
+  RegionVars[ "JetLeadPairs_PairAngle_invMMethod" ]   = jetLeadPairs[position_invM[0]].DeltaR(jetLeadPairs[position_invM[1]]);
+
+  // Pt difference between pairs 
+  // RegionVars[ "JetLeadPairs_PtDiffInPair_angleMethod" ] = toGeV(jetLeadPairs_difference[ position_angle[ 0 ] ] );
+  // RegionVars[ "JetLeadPairs_PtDiffInPair_invMMethod" ] = toGeV(jetLeadPairs_difference[ position_invM[ 0 ] ] );
+  VecRegionVars[ "JetLeadPairs_PtDiffInPair_angleMethod" ]  = jetLeadPairs_difference_output_angle;
+  VecRegionVars[ "JetLeadPairs_PtDiffInPair_invMMethod" ]   = jetLeadPairs_difference_output_invM;
+
+  // Mass difference between pairs
+  RegionVars[ "JetLeadPairs_MassDiff_angleMethod" ] = toGeV( abs(jetLeadPairs[ position_angle[ 0 ] ].M() - jetLeadPairs[ position_angle[ 1 ] ].M() ) );
+  RegionVars[ "JetLeadPairs_MassDiff_invMMethod" ]  = toGeV( abs(jetLeadPairs[ position_invM[ 0 ] ].M() - jetLeadPairs[ position_invM[ 1 ] ].M() ) );
+
+  // Jet specific pT
+  for( int i = 1; i <= counter; i ++ ) {
+    if(toGeV(jet_TLor[i].Pt()) > 25 ){
+      RegionVars[ "JetPt_" + std::to_string(i) ] = toGeV( jet_TLor[i].Pt() );
+    }
+  } 
+  
+  // pt5/pt4
+  if( counter > 4 ) {
+    RegionVars[ "pt5_pt4Ratio" ] = jet_TLor[4].Pt()/jet_TLor[3].Pt() ;
+  }
+
+  // DR between jet 5 and nearest of leading 4
+  if( counter > 4 ) {
+    RegionVars[ "jet5_DRNearestLead" ] = jet_TLor[4].DeltaR( jet_TLor[ nearestJet ] );
+  } 
 
   return EL::StatusCode::SUCCESS;
 }
