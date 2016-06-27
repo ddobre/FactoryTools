@@ -113,23 +113,20 @@ EL::StatusCode SelectNixonResolvedEvents :: execute ()
 
   if( preselectedRegionName == "" ) return EL::StatusCode::SUCCESS;
 
-  std::pair< xAOD::IParticleContainer* , xAOD::ParticleAuxContainer*> selectedJets   ( new xAOD::IParticleContainer(SG::VIEW_ELEMENTS) , nullptr);
+  std::pair<xAOD::IParticleContainer* , xAOD::ParticleAuxContainer*> selectedJets   ( new xAOD::IParticleContainer(SG::VIEW_ELEMENTS) , nullptr);
   selectedJets.first->setStore(selectedJets.second);
 
   STRONG_CHECK( store->record( selectedJets.first     , "selectedJets"    ) );//todo configurable if needed
   STRONG_CHECK( store->record( selectedJets.second    , "selectedJetsAux."    ) );//todo configurable if needed
 
-  const xAOD::JetContainer* jets_nominal(nullptr);
+  xAOD::JetContainer* jets_nominal(nullptr);
   STRONG_CHECK(store->retrieve(jets_nominal, "SignalJets"));
 
   for (const auto& jet : *jets_nominal) {
-    // Already did cleaning/pT/eta requirements before.
-    // Leave this as is for now in case we want more options later.
+    // If I've gotten this far, I have a signal, isolated, beautiful jet
     ATH_MSG_VERBOSE( "jet pt : " << jet->pt() );
-    
-    // xAOD::Jet* newjet = new xAOD::Jet();
-    selectedJets.first->push_back(jet  ); //(newjet )
-    // *newjet= *jet;
+
+    selectedJets.first->push_back(jet  );
   }
 
   //Let's just categorize from here maybe? But if we want different CRs in different algs,
