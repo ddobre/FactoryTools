@@ -127,9 +127,9 @@ EL::StatusCode SelectNixonResolvedEvents :: execute ()
     // Leave this as is for now in case we want more options later.
     ATH_MSG_VERBOSE( "jet pt : " << jet->pt() );
     
-    xAOD::Jet* newjet = new xAOD::Jet();
-    selectedJets.first->push_back(newjet  );
-    *newjet= *jet;
+    // xAOD::Jet* newjet = new xAOD::Jet();
+    selectedJets.first->push_back(jet  ); //(newjet )
+    // *newjet= *jet;
   }
 
   //Let's just categorize from here maybe? But if we want different CRs in different algs,
