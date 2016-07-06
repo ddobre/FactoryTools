@@ -133,6 +133,7 @@ EL::StatusCode RegionVarCalculator_nr::doAllCalculations(std::map<std::string, d
     }
   counter ++;
   }
+  for(const auto& jet: *jets_nominal) {delete jet;}
 
   // ---------- Calculations
 

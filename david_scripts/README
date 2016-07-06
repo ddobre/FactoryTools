@@ -1,0 +1,34 @@
+The logic I am using for the data structure I am running over is:
+
+//////////////////////////////////////////////////
+
+Working_directory(dir)
+
+  Grid_output(dir)
+    slice_1(dir)
+      root1.1 root2.2 ...
+    slice_2(dir)
+      root2.1 root2.2 ...
+    slice_3(dir)
+      etc...
+
+  bash_steering_creating_histograms.sh
+  
+  bash_steering_merging_histograms.sh
+  
+  creating_histograms.py
+  
+  make_hist_images.py
+
+//////////////////////////////////////////////////
+
+I have my python script designed to take in inputs as follows 
+
+  python creatingWeightedHists.py --inputDS Grid_output/slice_[n] --inputFile root[n].[m] 
+
+which is all fed in from the bash creating weighted hists steering script. 
+This bash script loops over all slice folders and root files within the folder, submitting all of the 27(?) jobs at once.
+This then outputs the created hists into a weighted_root_files folder in the Working_directory. 
+The bash_steering_merging script then goes through that folder and merges them all together. 
+
+Note the names aren't accurate. I trust you're more than capable of figuring out which one is which :P  
